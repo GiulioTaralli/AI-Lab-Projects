@@ -14,7 +14,7 @@ team(sweden, europe, underdog).
 team(united_states, north_central_america, pot_2).
 team(mexico, north_central_america, pot_2).
 team(canada, north_central_america, pot_3).
-team(costaRica, north_central_america, underdog).
+team(costa_rica, north_central_america, underdog).
 
 % South America (8)
 team(brazil, south_america, top_seed).

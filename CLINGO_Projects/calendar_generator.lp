@@ -17,8 +17,7 @@ pot(top_seed; pot_2; pot_3; underdog).
 { assigned(T,G) : group(G) } = 1 :- team(T,_,_).
 
 % Ogni girone ha esattamente una squadra di ciascuna fascia (pot)
-:- group(G), pot(P),
-   #count { T : team(T,_,P), assigned(T,G) } != 1.
+:- group(G), pot(P), #count { T : team(T,_,P), assigned(T,G) } != 1.
 
 % Quali continenti compaiono in un girone
 cont_in(G,Cont) :- team(T,Cont,_), assigned(T,G).
@@ -28,22 +27,18 @@ cont_in(G,Cont) :- team(T,Cont,_), assigned(T,G).
 
 % ==== GENERAZIONE PARTITE ====
 
-% Ogni coppia di squadre dello stesso girone gioca esattamente una volta,
-% in una delle 3 giornate
-{ play(T1,T2,D,G) : giornata(D) } = 1
-  :- assigned(T1,G), assigned(T2,G), T1 < T2, group(G).
+% Ogni coppia di squadre dello stesso girone gioca esattamente una volta, in una delle 3 giornate
+{ play(T1,T2,D,G) : giornata(D) } = 1 :- assigned(T1,G), assigned(T2,G), T1 < T2, group(G).
 
 % Normalizzo il match in entrambe le direzioni per contare le partite per squadra
 play_norm(T1,T2,D,G) :- play(T1,T2,D,G).
 play_norm(T2,T1,D,G) :- play(T1,T2,D,G).
 
 % Ogni squadra gioca esattamente 1 partita per giornata
-:- team(T,_,_), group(G), giornata(D), assigned(T,G),
-   #count { T2 : play_norm(T,T2,D,G) } != 1.
+:- team(T,_,_), group(G), giornata(D), assigned(T,G), #count { T2 : play_norm(T,T2,D,G) } != 1.
 
 % In ogni girone, in ogni giornata, ci devono essere esattamente 2 partite
-:- group(G), giornata(D),
-   #count { T1,T2 : play(T1,T2,D,G) } != 2.
+:- group(G), giornata(D), #count { T1,T2 : play(T1,T2,D,G) } != 2.
 
 % ==== OUTPUT ====
 % Per assegnare le squadre per girone
