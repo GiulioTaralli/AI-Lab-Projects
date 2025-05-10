@@ -3,13 +3,16 @@ week(1..24).
 
 % Giorni: lun-sab (nelle settimane full-time), ven-sab (altre settimane)
 day(mon; tue; wed; thu; fri; sat).
+day_num(mon, 1).  
+day_num(tue, 2).  
+day_num(wed, 3).  
+day_num(thu, 4).  
+day_num(fri, 5).  
+day_num(sat, 6).
 
 % Ore per giorno: 8 ore lun-ven, 6 ore sab
 hour(1..8).
 hour_saturday(1..6).
-
-% —— fatto di dominio per le durate L ∈ {2,3,4} ——
-dur(2..4).
 
 % Full-time weeks: settimana 7 e 16
 fulltime_week(7;16).
@@ -41,6 +44,8 @@ course("progettazione_e_sviluppo_di_applicazioni_web_su_dispositivi_mobile_i", "
 course("progettazione_e_sviluppo_di_applicazioni_web_su_dispositivi_mobile_ii", "schifanella_claudio", 10).
 course("la_gestione_delle_risorse_umane", "lombardo", 10).
 course("i_vincoli_giuridici_del_progetto_diritto_dei_media", "travostino", 10).
+
+professor(P) :- course(_, P, _).
 
 % —— fatti di propedeuticità ——
 prereq("fondamenti_di_ict_e_paradigmi_di_programmazione", "ambienti_di_sviluppo_e_linguaggi_client_side_per_il_web").
