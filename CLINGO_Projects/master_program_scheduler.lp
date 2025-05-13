@@ -131,12 +131,11 @@ first_week_social_media(W2) :- course("introduzione_al_social_media_management",
 :- prereq(C1, C2), last_week(C1, W1, _, _), first_week(C2, W2, _, _), W1 > W2.
 
 % Caso 2: stessa settimana, giorno di C2 precedente
-:- prereq(C1, C2), last_week(C1, W1, D1, _), first_week(C2, W2, D2, _), day_num(D1, N1), day_num(D2, N2), 
-   W1 == W2, N1 > N2.
+:- prereq(C1, C2), last_week(C1, W, D1, _), first_week(C2, W, D2, _), day_num(D1, N1), day_num(D2, N2), 
+   N1 > N2.
 
 % Caso 3: stesso giorno, ora di C2 precedente o uguale
-:- prereq(C1, C2), last_week(C1, W1, D1, H1), first_week(C2, W2, D2, H2), day_num(D1, N1), day_num(D2, N2), 
-   W1 == W2, N1 == N2, H1 >= H2.
+:- prereq(C1, C2), last_week(C1, W, D, H1), first_week(C2, W, D, H2), H1 >= H2.
 
 lesson_with_teacher(C, W, D, H, T) :- lesson(C, W, D, H), course(C, T, _).
 
