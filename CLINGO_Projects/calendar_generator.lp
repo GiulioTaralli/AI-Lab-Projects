@@ -1,50 +1,50 @@
-% ==== INCLUDO I DATI DELLE SQUADRE ====
+% ==== INCLUDE TEAM DATA ====
 #include "teams.lp".
 
-% ==== DOMINI ====
-% elenco esplicito dei 8 gironi
+% ==== DOMAINS ====
+% Explicit list of the 8 groups
 group(g1; g2; g3; g4; g5; g6; g7; g8).
 
-% 3 giornate
-giornata(1..3).
+% 3 matchdays
+matchdays(1..3).
 
-% fasce (usate solo nel vincolo)
+% Pots (used only in the constraint)
 pot(top_seed; pot_2; pot_3; underdog).
 
-% ==== ASSEGNAZIONE SQUADRE AI GIRONI ====
+% ==== ASSIGNMENT OF TEAMS TO THE GROUPS ====
 
-% Ogni squadra in esattamente un girone
+% Each team in exactly one group
 { assigned(T,G) : group(G) } = 1 :- team(T,_,_).
 
-% Ogni girone ha esattamente una squadra di ciascuna fascia (pot)
+% Each group has exactly one team from each pot
 :- group(G), pot(P), #count { T : team(T,_,P), assigned(T,G) } != 1.
 
-% Quali continenti compaiono in un girone
+% Which continents appear in a circle
 cont_in(G,Cont) :- team(T,Cont,_), assigned(T,G).
 
-% Ogni girone deve avere almeno 3 continenti distinti
+% Each group must have at least 3 distinct continents
 :- group(G), #count { C : cont_in(G,C) } < 3.
 
-% ==== GENERAZIONE PARTITE ====
+% ==== GAME GENERATION ====
 
-% Ogni coppia di squadre dello stesso girone gioca esattamente una volta, in una delle 3 giornate
-{ play(T1,T2,D,G) : giornata(D) } = 1 :- assigned(T1,G), assigned(T2,G), T1 < T2, group(G).
+% Each pair of teams from the same group plays exactly once, in one of the 3 matchdays
+{ play(T1,T2,D,G) : matchdays(D) } = 1 :- assigned(T1,G), assigned(T2,G), T1 < T2, group(G).
 
-% Normalizzo il match in entrambe le direzioni per contare le partite per squadra
+% Normalize the match in both directions to count the games per team
 play_norm(T1,T2,D,G) :- play(T1,T2,D,G).
 play_norm(T2,T1,D,G) :- play(T1,T2,D,G).
 
-% Ogni squadra gioca esattamente 1 partita per giornata
-:- team(T,_,_), group(G), giornata(D), assigned(T,G), #count { T2 : play_norm(T,T2,D,G) } != 1.
+% Each team plays exactly 1 match per matchday
+:- team(T,_,_), group(G), matchdays(D), assigned(T,G), #count { T2 : play_norm(T,T2,D,G) } != 1.
 
-% In ogni girone, in ogni giornata, ci devono essere esattamente 2 partite
-:- group(G), giornata(D), #count { T1,T2 : play(T1,T2,D,G) } != 2.
+% In each group, on each matchdays, there must be exactly 2 matches
+:- group(G), matchdays(D), #count { T1,T2 : play(T1,T2,D,G) } != 2.
 
 % ==== OUTPUT ====
-% Per assegnare le squadre per girone
+% To assign teams by group
 team_in_group(G, T) :- assigned(T, G).
 
-% Per ordinare le giornate
+% To order the matchdays
 match_day(D, T1, T2, G) :- play(T1, T2, D, G).
 
 #show team_in_group/2.

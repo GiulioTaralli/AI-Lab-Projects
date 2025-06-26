@@ -27,6 +27,7 @@ a_star_search([node(Pos, G, _, _, Path)|Open], Check_Goal, Check_Move, Heuristic
         (
             call(Check_Move, Pos, Next_Move, Step_Cost),
             \+ member(Next_Move, Path),
+            \+ member(node(Next_Move, _, _, _, _), Open),
             G_Next is G + Step_Cost,
             call(Heuristic, Next_Move, H_Next),
             F_Next is G_Next + H_Next
