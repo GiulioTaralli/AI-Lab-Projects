@@ -26,7 +26,6 @@
 (defrule go-on-env-first (declare (salience 30))
   ?f <- (first-pass-to-env)
 =>
-
   (retract ?f)
   (focus ENV)
 )
@@ -34,9 +33,7 @@
 (defrule go-on-agent  (declare (salience 20))
    (maxduration ?d)
    (status (step ?s&:(< ?s ?d)) (currently running))
-
  =>
-
     ;(printout t crlf crlf)
     ;(printout t "vado ad agent  step" ?s)
     (focus AGENT)
@@ -47,13 +44,10 @@
 (defrule go-on-env  (declare (salience 30))
   ?f1<-	(status (step ?s))
   (exec (step ?s)) 	;// azione da eseguire al passo s, viene simulata dall'environment
-
 =>
-
   ; (printout t crlf crlf)
   ; (printout t "vado ad ENV  step" ?s)
   (focus ENV)
-
 )
 
 (defrule game-over

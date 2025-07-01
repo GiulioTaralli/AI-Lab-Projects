@@ -97,7 +97,6 @@
 )
 
 (defrule hit-boat-hor-trace
-
 	(cell (x ?x) (y ?y) (content hit-boat))
 	?b<- (boat-hor (x ?x) (ys $? ?y $?) (size ?s) (status $?prima safe $?dopo))
         (not (considered ?x ?y))
@@ -107,7 +106,6 @@
 )
 
 (defrule hit-boat-ver-trace
-
 	(cell (x ?x) (y ?y) (content hit-boat))
         (not (considered ?x ?y))
 	?b <-(boat-ver (xs $? ?x $?) (y ?y) (size ?s) (status $?prima safe $?dopo))
@@ -117,23 +115,19 @@
 )
 
 (defrule sink-boat-hor
-
 	(cell (x ?x) (y ?y) (content hit-boat))
 	(boat-hor (name ?n) (x ?x) (ys $? ?y $?) (size ?s) (status $?ss))
-        
+
 	(or 
 		(and (test (eq ?s 1))
 		     (test (subsetp $?ss (create$ hit)))
                 )
-
 		(and (test (eq ?s 2))
 		     (test (subsetp $?ss (create$ hit hit)))
                 )
-
 		(and (test (eq ?s 3))
 		     (test (subsetp $?ss (create$ hit hit hit)))
                 )
-
 		(and (test (eq ?s 4))
 		     (test (subsetp $?ss (create$ hit hit hit hit)))
                 )
@@ -143,7 +137,6 @@
 )
 
 (defrule sink-boat-ver
-
 	(cell (x ?x) (y ?y) (content hit-boat))
 	(boat-ver (name ?n) (xs $? ?x $?) (y ?y) (size ?s) (status $?ss))
         
@@ -151,15 +144,12 @@
 		(and (test (eq ?s 1))
 		     (test (subsetp $?ss (create$ hit)))
                 )
-
 		(and (test (eq ?s 2))
 		     (test (subsetp $?ss (create$ hit hit)))
                 )
-
 		(and (test (eq ?s 3))
 		     (test (subsetp $?ss (create$ hit hit hit)))
                 )
-
 		(and (test (eq ?s 4))
 		     (test (subsetp $?ss (create$ hit hit hit hit)))
                 )
@@ -171,11 +161,12 @@
 (defrule solve-count-guessed-ok
         (solve)
         (guess ?x ?y)
-        ?c <- (cell (x ?x) (y ?y) (content boat) (status none))
+        ?c <- (cell (x ?x) (y ?y) (content boat|hit-boat) (status none|fired))
         ?st <- (statistics (num_guess_ok ?gok))
 =>
-	(modify ?st (num_guess_ok (+ 1 ?gok)))
-	(modify ?c (content hit-boat) (status guessed))
+  (printout t "ENV --- [ " ?x " ] [ " ?y " ] " crlf)
+  (modify ?st (num_guess_ok (+ 1 ?gok)))
+  (modify ?c (content hit-boat) (status guessed))
 )
 
 (defrule solve-count-guessed-ko 

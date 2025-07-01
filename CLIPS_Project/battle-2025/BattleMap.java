@@ -68,7 +68,7 @@ public class BattleMap {
 				counter++;
 				if (matrix[x][y].isWater())
                                     grid[x][y].setIcon(water);
-				grid[x][y].setPreferredSize(new Dimension(100, 100));	  
+				grid[x][y].setPreferredSize(new Dimension(75, 75));	  
 				panGrid.add(grid[x][y]); //adds button to grid
                                
                                 grid[x][y].addActionListener(new ActionListener()
