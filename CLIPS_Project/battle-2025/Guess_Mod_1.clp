@@ -4,7 +4,7 @@
 
 ; ############## GUESS ON THE KNOWING CELLS ###############
 
-; Make a Guess on a K-Cell with top content
+; Make a guess on a K-cell with top content
 (defrule guessTopKCell (declare (salience 100))
 	(status (step ?s) (currently running))
 	(k-cell (x ?x) (y ?y) (content top))
@@ -13,7 +13,7 @@
 =>
 	(printout t crlf)
 	(printout t "Step " ?s ":    GUESS cell [" ?x "," ?y "] top"crlf)
-	(assert (exec (step ?s) (action guess) (x ?x) (y ?y)))	;guess K-CELL TOP
+	(assert (exec (step ?s) (action guess) (x ?x) (y ?y)))	; guess K-cell TOP
 	; Assert water around the cell
 	(assert (k-cell (x (- ?x 1)) (y ?y) (content water))) 	; up
 	(assert (k-cell (x ?x) (y (- ?y 1)) (content water)))	; left
@@ -27,7 +27,7 @@
 	(focus MAIN)
 )
 
-; Make a Guess on a cell positioned under a K-Cell with top content
+; Make a Guess on a cell positioned under a K-cell with top content
 (defrule guessCellUnderTopKCell
 	(status (step ?s) (currently running))
 	(k-cell (x ?x) (y ?y) (content top))
@@ -53,7 +53,7 @@
 =>
 	(printout t crlf)
 	(printout t "Step " ?s ":    GUESS cell [" ?x "," ?y "] bot"crlf)
-	(assert (exec (step ?s) (action guess) (x ?x) (y ?y)))	;guess K-CELL BOT
+	(assert (exec (step ?s) (action guess) (x ?x) (y ?y)))	;guess K-cell BOT
 	; Assert water around the cell
 	(assert (k-cell (x (+ ?x 1)) (y ?y) (content water))) ; down
 	(assert (k-cell (x ?x) (y (- ?y 1)) (content water))) ; left
@@ -67,7 +67,7 @@
 	(focus MAIN)
 )
 
-; Make a Guess on a cell positioned on a K-Cell with Bottom content
+; Make a Guess on a cell positioned on a K-cell with Bottom content
 (defrule guessCellOnTopBottomKCell 
 	(status (step ?s) (currently running))
 	(k-cell (x ?x) (y ?y) (content bot))
@@ -84,7 +84,7 @@
 	(focus MAIN)
 )
 
-; Make a Guess on a K-Cell with Right Content
+; Make a Guess on a K-cell with Right Content
 (defrule guessRightKCell (declare (salience 100))
 	(status (step ?s)(currently running))
 	(k-cell (x ?x) (y ?y) (content right))
@@ -106,7 +106,7 @@
 	(focus MAIN)
 )
 
-; Make a Guess on a cell positioned to the left of a K-Cell with right content
+; Make a Guess on a cell positioned to the left of a K-cell with right content
 (defrule guessCellOnLeftKCellRIght
 	(status (step ?s) (currently running))
 	(k-cell (x ?x) (y ?y) (content right))
@@ -123,7 +123,7 @@
 	(focus MAIN)
 )
 
-; Make a Guess on a K-Cell with left content
+; Make a Guess on a K-cell with left content
 (defrule guessLeftKCell (declare (salience 100))
 	(status (step ?s) (currently running))
 	(k-cell (x ?x) (y ?y) (content left))
@@ -146,7 +146,7 @@
 	(focus MAIN)
 )
 
-; Make a Guess on a cell positioned to the right of a K-Cell with left content
+; Make a Guess on a cell positioned to the right of a K-cell with left content
 (defrule guessCellOnRightKCellLeft
 	(status (step ?s) (currently running))
 	(k-cell (x ?x) (y ?y) (content left))
@@ -163,7 +163,7 @@
 	(focus MAIN)
 )
 
-; Make a Guess on a K-Cell with sub (submarine) content
+; Make a Guess on a K-cell with sub (submarine) content
 (defrule guessSubKCell (declare (salience 100))
 	(status (step ?s) (currently running))
 	(k-cell (x ?x) (y ?y) (content sub))
@@ -192,7 +192,7 @@
 	(focus MAIN)
 )
 
-; Make a Guess on a K-Cell with middle content
+; Make a Guess on a K-cell with middle content
 (defrule guessMiddleKCell (declare (salience 100))
 	(status (step ?s)(currently running))
 	(k-cell (x ?x) (y ?y) (content middle))
@@ -213,7 +213,7 @@
 
 ; ################ GUESS ON THE NEAR MIDDLE CELLS ##########################
 
-; If the K-Cell middle has a water to the right or left and the cell above it was not guessed, 
+; If the K-cell middle has a water to the right or left and the cell above it was not guessed, 
 ; then guess on it
 (defrule guessOnTopMiddleKCell
 	(status (step ?s) (currently running))
@@ -237,7 +237,7 @@
 	(focus MAIN)
 )
 
-; If the K-Cell middle has a water to the right or left and the cell below was not guessed, 
+; If the K-cell middle has a water to the right or left and the cell below was not guessed, 
 ; then guess on it
 (defrule guessOnBotMiddleKCell
 	(status (step ?s) (currently running))
@@ -261,7 +261,7 @@
 	(focus MAIN)
 )
 
-; If the K-Cell middle has a water above or below and the cell to the left was not guessed, 
+; If the K-cell middle has a water above or below and the cell to the left was not guessed, 
 ; then guess on it
 (defrule guessOnLeftMiddleKCell
 	(status (step ?s) (currently running))
@@ -285,7 +285,7 @@
 	(focus MAIN)
 )
 
-; If the K-Cell Middle has a water above or below and the cell on the right was not guessed, 
+; If the K-cell Middle has a water above or below and the cell on the right was not guessed, 
 ; then guess on it
 (defrule guessOnRightMiddleKCell
 	(status (step ?s) (currently running))
