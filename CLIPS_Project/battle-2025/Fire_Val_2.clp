@@ -11,7 +11,7 @@
 	(focus FIRE_MOD)
 )
 
-; If there are still battleships then recall the fire module
+; If there are still battleships then call the fire module
 (defrule fireIfBattleship
 	(status (step ?s)(currently running))
 	(battleship (to_find ?to_find_b &:(> ?to_find_b 0)))
@@ -33,7 +33,7 @@
 	(not (exec (action guess) (x ?x) (y ?y)))
 =>
 	(printout t crlf)
-	(printout t "Step " ?s ":    FIRE ON [" ?x ", " ?y "] based on best K-ROW and K-COL" crlf)
+	(printout t "Step " ?s ": FIRE ON [" ?x ", " ?y "] based on best K-ROW and K-COL" crlf)
 	(assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
 	(focus MAIN)
 )
@@ -121,7 +121,7 @@
   (test (and (>= ?x 0) (< ?x 10) (>= ?y 0) (< ?y 10)))
   (not (exec (action fire) (x ?x) (y ?y)))
 =>
-  (printout t "!!! EMERGENCY: No better move found, FIRING on [" ?x ", " ?y "]" crlf)
+  (printout t "Step " ?s ": fallback, no better move found, FIRE on [" ?x ", " ?y "]" crlf)
   (assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
   (focus MAIN)
 )

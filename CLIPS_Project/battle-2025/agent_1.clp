@@ -1,8 +1,8 @@
-; ###################################### AGENT 1 ###############################################
+; ####################################### AGENT 1 #######################################
 
 (defmodule AGENT (import MAIN ?ALL) (import ENV ?ALL) (export ?ALL))
 
-;  ###################### AGENT FACTS ########################
+; ######################## AGENT FACTS ########################
 
 ; Number of ships still to be discovered by type
 (deftemplate submarine	
@@ -41,7 +41,7 @@
 (deftemplate cell_status
 	(slot kx)
 	(slot ky)
-	(slot stat (allowed-values none guessed fired) )
+	(slot stat (allowed-values none guessed fired))
 )
 
 ; Template for controls on lines/columns
@@ -98,7 +98,7 @@
 	(slot ydx)
 )
 
-;  ###################### INITIALIZATION ########################
+; ######################## INITIALIZATION ########################
 
 ; Print in case there are no known cells at the beginning
 (defrule beginning-no-knowledge (declare (salience 501))
@@ -149,7 +149,7 @@
 	(printout t crlf)
 )
 
-; He asserts water in all cells that surround the game table to avoid problems of trespassing
+; Asserts water in all cells that surround the game table to avoid problems of trespassing
 (defrule settWaterBoundary (declare (salience 500))
 	(status (step ?s)(currently running))
 =>
@@ -174,141 +174,7 @@
 	(assert (k-cell (x 10) (y 9)))
 )
 
-; ################ MANAGEMENT OF SHIPS FOUND ##########################
-
-; Vertical cruisers
-(defrule verticalCruiserFound 
-	(status (step ?s)(currently running))
-	?ctf <- (cruiser (to_find ?to_find_c ))
-	(cruiser (to_find ?to_find_c &:(> ?to_find_c 0)))
-	
-	(or			
-		; If middle cell is guessed or fired
-		(cell_status (kx ?x) (ky ?y) (stat guessed)) 
-		(cell_status (kx ?x) (ky ?y) (stat fired)) 
-	)
-	(or			
-		; If top cell is guessed or fired
-		(cell_status (kx ?x_top &:(eq ?x_top (- ?x 1))) (ky ?y) (stat guessed))
-		(cell_status (kx ?x_top &:(eq ?x_top (- ?x 1))) (ky ?y) (stat fired))
-	)	
-	(or			
-		; If bottom cell is guessed or fired
-		(cell_status (kx ?x_bot &:(eq ?x_bot (+ ?x 1))) (ky ?y) (stat guessed))	
-		(cell_status (kx ?x_bot &:(eq ?x_bot (+ ?x 1))) (ky ?y) (stat fired))
-	)
-	; Check that you have water at the ends
-	(k-cell (x ?x_top2 &:(eq ?x_top2 (- ?x 2))) (y ?y) (content water)) 
-	(k-cell (x ?x_bot2 &:(eq ?x_bot2 (+ ?x 2))) (y ?y) (content water)) 
-	; Check that it has not already been found
-	(not (cruiser_vert_found 
-		(xtop ?xtop &:(eq ?xtop (- ?x 1)))
-		(xmid ?x)
-		(xbot ?xbot &:(eq ?xbot (+ ?x 1))) 
-		(y ?y)
-		))
-=>	
-	(modify ?ctf (to_find (- ?to_find_c 1)))
-	(assert (cruiser_vert_found (xtop (- ?x 1))	(xmid ?x) (xbot (+ ?x 1)) (y ?y)))
-	(printout t crlf)
-	(printout t "VERTICAL CRUISER FOUND!!")
-	(printout t crlf)
-)
-
-; Horizontal cruisers
-(defrule horizontalCruiserFound 
-	(status (step ?s)(currently running))
-	?ctf <- (cruiser (to_find ?to_find_c ))
-	(cruiser (to_find ?to_find_c &:(> ?to_find_c 0)))
-	(or			
-		; If middle cell is guessed or fired
-		(cell_status (kx ?x) (ky ?y) (stat guessed)) 
-		(cell_status (kx ?x) (ky ?y) (stat fired)) 
-	)
-	(or			
-		; If top cell is guessed or fired
-		(cell_status (kx ?x) (ky ?y_left &:(eq ?y_left (- ?y 1))) (stat guessed))
-		(cell_status (kx ?x) (ky ?y_left &:(eq ?y_left (- ?y 1))) (stat fired))
-	)	
-	(or			
-		; If right cell is guessed or fired
-		(cell_status (kx ?x) (ky ?y_right &:(eq ?y_right (+ ?y 1))) (stat guessed))	
-		(cell_status (kx ?x) (ky ?y_right &:(eq ?y_right (+ ?y 1))) (stat fired))
-	)
-	; Check that you have water at the ends
-	(k-cell (x ?x) (y ?y_left2 &:(eq ?y_left2 (- ?y 2))) (content water)) 
-	(k-cell (x ?x) (y ?y_right2 &:(eq ?y_right2 (+ ?y 2))) (content water)) 
-	; Check that it has not already been found
-	(not (cruiser_orizz_found 
-		 (x ?x) (ysx ?yleft &:(eq ?yleft (- ?y 1))) 
-		 (ymid ?y) 
-		 (ydx ?yright &:(eq ?yright (+ ?y 1))) 
-	)) 
-=>	
-	(modify ?ctf (to_find (- ?to_find_c 1)))
-	(assert (cruiser_orizz_found (x ?x) (ysx (- ?y 1)) (ymid ?y) (ydx (+ ?y 1)))) 
-	(printout t crlf)
-	(printout t "HORIZONTAL CRUISER FOUND!!")
-	(printout t crlf)
-)
-
-; Vertical destroyers
-(defrule verticalDestroyerFound 
-	(status (step ?s)(currently running))
-	?ctf <- (destroyer (to_find ?to_find_c ))
-	(destroyer (to_find ?to_find_c &:(> ?to_find_c 0)))
-	
-	(or			
-		; If top cell is guessed or fired
-		(cell_status (kx ?x) (ky ?y) (stat guessed)) 
-		(cell_status (kx ?x) (ky ?y) (stat fired)) 
-	)
-	(or			
-		; If bottom cell is guessed or fired
-		(cell_status (kx ?x_bot &:(eq ?x_bot (+ ?x 1))) (ky ?y) (stat guessed))	
-		(cell_status (kx ?x_bot &:(eq ?x_bot (+ ?x 1))) (ky ?y) (stat fired))
-	)
-	; Check that you have water at the ends
-	(k-cell (x ?x_top2 &:(eq ?x_top2 (- ?x 1))) (y ?y) (content water)) 
-	(k-cell (x ?x_bot2 &:(eq ?x_bot2 (+ ?x 2))) (y ?y) (content water)) 
-	; Check that it has not already been found
-	(not (destroyer_vert_found (xtop ?x) (xbot ?xbot &:(eq ?xbot (+ ?x 1))) (y ?y)))
-=>	
-	(modify ?ctf (to_find (- ?to_find_c 1)))
-	(assert (destroyer_vert_found (xtop  ?x ) (xbot (+ ?x 1)) (y ?y)))
-	(printout t crlf)
-	(printout t "VERTICAL DESTROYER FOUND!!")
-	(printout t crlf)
-)
-
-; Horizontal destroyers
-(defrule horizontalDestroyerFound 
-	(status (step ?s)(currently running))
-	?ctf <- (destroyer (to_find ?to_find_c ))
-	(destroyer (to_find ?to_find_c &:(> ?to_find_c 0)))
-	(or			
-		; Se left e' guessed or fired
-		(cell_status (kx ?x) (ky ?y) (stat guessed)) 
-		(cell_status (kx ?x) (ky ?y) (stat fired)) 
-	)
-	(or			
-		; If right cell is guessed or fired
-		(cell_status (kx ?x) (ky ?y_right &:(eq ?y_right (+ ?y 1))) (stat guessed))	
-		(cell_status (kx ?x) (ky ?y_right &:(eq ?y_right (+ ?y 1))) (stat fired))
-	)
-	; Check that you have water at the ends
-	(k-cell (x ?x) (y ?y_left2 &:(eq ?y_left2 (- ?y 1))) (content water)) 
-	(k-cell (x ?x) (y ?y_right2 &:(eq ?y_right2 (+ ?y 2))) (content water)) 
-	; Check that it has not already been found
-	(not (destroyer_orizz_found (x ?x) (ysx ?y) (ydx ?yright &:(eq ?yright (+ ?y 1))))) 
-=>	
-	(modify ?ctf (to_find (- ?to_find_c 1)))
-	(assert (destroyer_orizz_found (x ?x) (ysx  ?y ) (ydx (+ ?y 1)))) 
-	(printout t crlf)
-	(printout t "HORIZONTAL DESTROYER FOUND!!")
-	(printout t crlf)
-)
-
+; ######################## MANAGEMENT OF SHIPS FOUND ########################
 
 ; Vertical battleships
 (defrule verticalBattleshipFound
@@ -344,12 +210,13 @@
 		(xmid ?x)
 		(xmid1 ?xmid &:(eq ?xmid (+ ?x 1))) 
 		(xbot ?xbot &:(eq ?xbot (+ ?x 2))) 
-		))
+		)
+	)
 =>	
 	(modify ?btf (to_find (- ?to_find_b 1)))
 	(assert (battleship_vert_found (xtop (- ?x 1))	(xmid ?x) (xmid1 (+ ?x 1)) (xbot (+ ?x 2))))
 	(printout t crlf)
-	(printout t "VERTICAL BATTLESHIP FOUND!!")
+	(printout t "VERTICAL BATTLESHIP FOUND!")
 	(printout t crlf)
 )
 
@@ -360,8 +227,8 @@
 	(battleship (to_find ?to_find_b &:(> ?to_find_b 0)))
 	(or			
 		; If middle cell is guessed or fired
-		(cell_status (kx ?x) (ky ?y) (stat guessed) ) 
-		(cell_status (kx ?x) (ky ?y) (stat fired) ) 
+		(cell_status (kx ?x) (ky ?y) (stat guessed)) 
+		(cell_status (kx ?x) (ky ?y) (stat fired)) 
 	)
 	(or			
 		; If top cell is guessed or fired
@@ -387,16 +254,151 @@
 		 (ymid ?y) 
 		 (ymid1 ?ymid &:(eq ?ymid (+ ?y 1)))
 		 (ydx ?yright &:(eq ?yright (+ ?y 2))) 
-	)) 
+		)
+	) 
 =>	
 	(modify ?btf (to_find (- ?to_find_b 1)))
 	(assert (battleship_orizz_found (x ?x) (ysx (- ?y 1)) (ymid ?y) (ymid1 (+ ?y 1)) (ydx (+ ?y 2)))) 
 	(printout t crlf)
-	(printout t "HORIZONTAL BATTLESHIP FOUND!!")
+	(printout t "HORIZONTAL BATTLESHIP FOUND!")
 	(printout t crlf)
 )
 
-; ####################### INVOCATION EXTERNAL MODULES #########################
+; Vertical cruisers
+(defrule verticalCruiserFound 
+	(status (step ?s)(currently running))
+	?ctf <- (cruiser (to_find ?to_find_c ))
+	(cruiser (to_find ?to_find_c &:(> ?to_find_c 0)))
+	(or			
+		; If middle cell is guessed or fired
+		(cell_status (kx ?x) (ky ?y) (stat guessed)) 
+		(cell_status (kx ?x) (ky ?y) (stat fired)) 
+	)
+	(or			
+		; If top cell is guessed or fired
+		(cell_status (kx ?x_top &:(eq ?x_top (- ?x 1))) (ky ?y) (stat guessed))
+		(cell_status (kx ?x_top &:(eq ?x_top (- ?x 1))) (ky ?y) (stat fired))
+	)	
+	(or			
+		; If bottom cell is guessed or fired
+		(cell_status (kx ?x_bot &:(eq ?x_bot (+ ?x 1))) (ky ?y) (stat guessed))	
+		(cell_status (kx ?x_bot &:(eq ?x_bot (+ ?x 1))) (ky ?y) (stat fired))
+	)
+	; Check that you have water at the ends
+	(k-cell (x ?x_top2 &:(eq ?x_top2 (- ?x 2))) (y ?y) (content water)) 
+	(k-cell (x ?x_bot2 &:(eq ?x_bot2 (+ ?x 2))) (y ?y) (content water)) 
+	; Check that it has not already been found
+	(not (cruiser_vert_found 
+		(xtop ?xtop &:(eq ?xtop (- ?x 1)))
+		(xmid ?x)
+		(xbot ?xbot &:(eq ?xbot (+ ?x 1))) 
+		(y ?y)
+		)
+	)
+=>	
+	(modify ?ctf (to_find (- ?to_find_c 1)))
+	(assert (cruiser_vert_found (xtop (- ?x 1))	(xmid ?x) (xbot (+ ?x 1)) (y ?y)))
+	(printout t crlf)
+	(printout t "VERTICAL CRUISER FOUND!")
+	(printout t crlf)
+)
+
+; Horizontal cruisers
+(defrule horizontalCruiserFound 
+	(status (step ?s)(currently running))
+	?ctf <- (cruiser (to_find ?to_find_c ))
+	(cruiser (to_find ?to_find_c &:(> ?to_find_c 0)))
+	(or			
+		; If middle cell is guessed or fired
+		(cell_status (kx ?x) (ky ?y) (stat guessed)) 
+		(cell_status (kx ?x) (ky ?y) (stat fired)) 
+	)
+	(or			
+		; If top cell is guessed or fired
+		(cell_status (kx ?x) (ky ?y_left &:(eq ?y_left (- ?y 1))) (stat guessed))
+		(cell_status (kx ?x) (ky ?y_left &:(eq ?y_left (- ?y 1))) (stat fired))
+	)	
+	(or			
+		; If right cell is guessed or fired
+		(cell_status (kx ?x) (ky ?y_right &:(eq ?y_right (+ ?y 1))) (stat guessed))	
+		(cell_status (kx ?x) (ky ?y_right &:(eq ?y_right (+ ?y 1))) (stat fired))
+	)
+	; Check that you have water at the ends
+	(k-cell (x ?x) (y ?y_left2 &:(eq ?y_left2 (- ?y 2))) (content water)) 
+	(k-cell (x ?x) (y ?y_right2 &:(eq ?y_right2 (+ ?y 2))) (content water)) 
+	; Check that it has not already been found
+	(not (cruiser_orizz_found 
+		 (x ?x) (ysx ?yleft &:(eq ?yleft (- ?y 1))) 
+		 (ymid ?y) 
+		 (ydx ?yright &:(eq ?yright (+ ?y 1))) 
+		)
+	) 
+=>	
+	(modify ?ctf (to_find (- ?to_find_c 1)))
+	(assert (cruiser_orizz_found (x ?x) (ysx (- ?y 1)) (ymid ?y) (ydx (+ ?y 1)))) 
+	(printout t crlf)
+	(printout t "HORIZONTAL CRUISER FOUND!")
+	(printout t crlf)
+)
+
+; Vertical destroyers
+(defrule verticalDestroyerFound 
+	(status (step ?s)(currently running))
+	?ctf <- (destroyer (to_find ?to_find_c ))
+	(destroyer (to_find ?to_find_c &:(> ?to_find_c 0)))
+	
+	(or			
+		; If top cell is guessed or fired
+		(cell_status (kx ?x) (ky ?y) (stat guessed)) 
+		(cell_status (kx ?x) (ky ?y) (stat fired)) 
+	)
+	(or			
+		; If bottom cell is guessed or fired
+		(cell_status (kx ?x_bot &:(eq ?x_bot (+ ?x 1))) (ky ?y) (stat guessed))	
+		(cell_status (kx ?x_bot &:(eq ?x_bot (+ ?x 1))) (ky ?y) (stat fired))
+	)
+	; Check that you have water at the ends
+	(k-cell (x ?x_top2 &:(eq ?x_top2 (- ?x 1))) (y ?y) (content water)) 
+	(k-cell (x ?x_bot2 &:(eq ?x_bot2 (+ ?x 2))) (y ?y) (content water)) 
+	; Check that it has not already been found
+	(not (destroyer_vert_found (xtop ?x) (xbot ?xbot &:(eq ?xbot (+ ?x 1))) (y ?y)))
+=>	
+	(modify ?ctf (to_find (- ?to_find_c 1)))
+	(assert (destroyer_vert_found (xtop  ?x ) (xbot (+ ?x 1)) (y ?y)))
+	(printout t crlf)
+	(printout t "VERTICAL DESTROYER FOUND!")
+	(printout t crlf)
+)
+
+; Horizontal destroyers
+(defrule horizontalDestroyerFound 
+	(status (step ?s)(currently running))
+	?ctf <- (destroyer (to_find ?to_find_c ))
+	(destroyer (to_find ?to_find_c &:(> ?to_find_c 0)))
+	(or			
+		; Se left e' guessed or fired
+		(cell_status (kx ?x) (ky ?y) (stat guessed)) 
+		(cell_status (kx ?x) (ky ?y) (stat fired)) 
+	)
+	(or			
+		; If right cell is guessed or fired
+		(cell_status (kx ?x) (ky ?y_right &:(eq ?y_right (+ ?y 1))) (stat guessed))	
+		(cell_status (kx ?x) (ky ?y_right &:(eq ?y_right (+ ?y 1))) (stat fired))
+	)
+	; Check that you have water at the ends
+	(k-cell (x ?x) (y ?y_left2 &:(eq ?y_left2 (- ?y 1))) (content water)) 
+	(k-cell (x ?x) (y ?y_right2 &:(eq ?y_right2 (+ ?y 2))) (content water)) 
+	; Check that it has not already been found
+	(not (destroyer_orizz_found (x ?x) (ysx ?y) (ydx ?yright &:(eq ?yright (+ ?y 1))))) 
+=>	
+	(modify ?ctf (to_find (- ?to_find_c 1)))
+	(assert (destroyer_orizz_found (x ?x) (ysx  ?y ) (ydx (+ ?y 1)))) 
+	(printout t crlf)
+	(printout t "HORIZONTAL DESTROYER FOUND!")
+	(printout t crlf)
+)
+
+; ######################## INVOCATION EXTERNAL MODULES ########################
 
 ; When it can no longer do anything the focus is passed to the Guess Module
 (defrule guessModule 
@@ -414,7 +416,7 @@
 	(focus FIRE_VAL)  
 )
 
-; ####################### TERMINATION #########################
+; ######################## TERMINATION ########################
 
 ; When it doesn't know what to do is invoked the SOLVE
 (defrule solve (declare (salience -500))
@@ -423,13 +425,13 @@
 	(destroyer (to_find ?to_find_d))
 	(cruiser (to_find ?to_find_c))
 	(battleship (to_find ?to_find_b))
-	(moves (fires ?nf) (guesses ?ng) )
+	(moves (fires ?nf) (guesses ?ng))
 =>
 	(assert (exec (step ?s) (action solve)))
 	(printout t crlf)
-	(printout t "I don't know what to do anymore: let's SOLVE!" crlf)
+	(printout t "I don't know what else to do. I'm ending the game." crlf)
 	(printout t crlf)
-	(printout t "Fires left: " ?nf "   Guess left: " ?ng " "crlf)
+	(printout t "Fires left: " ?nf ", Guess left: " ?ng " "crlf)
 	(printout t crlf)
 	(pop-focus)
 )

@@ -1,8 +1,8 @@
-; ################################## MODULO GUESS ############################################
+; ################################### GUESS MODULE ###################################
 
 (defmodule GUESS_MOD (import MAIN ?ALL) (import ENV ?ALL) (import AGENT ?ALL) (export ?ALL))
 
-; ############## GUESS ON THE KNOWING CELLS ###############
+; ############### GUESS ON THE KNOWING CELLS ###############
 
 ; Make a guess on a K-cell with top content
 (defrule guessTopKCell (declare (salience 100))
@@ -12,7 +12,7 @@
 	(moves (guesses ?ng &:(> ?ng 0)))
 =>
 	(printout t crlf)
-	(printout t "Step " ?s ":    GUESS cell [" ?x "," ?y "] top"crlf)
+	(printout t "Step " ?s ": GUESS cell [" ?x "," ?y "] top"crlf)
 	(assert (exec (step ?s) (action guess) (x ?x) (y ?y)))	; guess K-cell TOP
 	; Assert water around the cell
 	(assert (k-cell (x (- ?x 1)) (y ?y) (content water))) 	; up
@@ -27,24 +27,7 @@
 	(focus MAIN)
 )
 
-; Make a Guess on a cell positioned under a K-cell with top content
-(defrule guessCellUnderTopKCell
-	(status (step ?s) (currently running))
-	(k-cell (x ?x) (y ?y) (content top))
-	(not (exec (action guess) (x ?x-under &:(eq ?x-under(+ ?x 1))) (y ?y)))
-	(moves (guesses ?ng &:(> ?ng 0)))
-=>
-	(printout t crlf)
-	(printout t "Step " ?s ":    GUESS cell [" (+ ?x 1) "," ?y "]"crlf)
-	(assert (exec (step ?s) (action guess) (x (+ ?x 1)) (y ?y)))
-	(assert (k-cell (x (+ ?x 2)) (y (- ?y 1)) (content water)))	; down diag left
-	(assert (k-cell (x (+ ?x 2)) (y (+ ?y 1)) (content water)))	;down diag right
-	; Keeps track that the cell was guessed
-	(assert (cell_status (kx (+ ?x 1)) (ky ?y) (stat guessed)))
-	(focus MAIN)
-)
-
-; Make a Guess on a K-Cell with Bottom content
+; Make a guess on a K-cell with bottom content
 (defrule guessBottomKCell (declare (salience 100))
 	(status (step ?s) (currently running))
 	(k-cell (x ?x) (y ?y) (content bot))
@@ -52,7 +35,7 @@
 	(moves (guesses ?ng &:(> ?ng 0)))
 =>
 	(printout t crlf)
-	(printout t "Step " ?s ":    GUESS cell [" ?x "," ?y "] bot"crlf)
+	(printout t "Step " ?s ": GUESS cell [" ?x "," ?y "] bot"crlf)
 	(assert (exec (step ?s) (action guess) (x ?x) (y ?y)))	;guess K-cell BOT
 	; Assert water around the cell
 	(assert (k-cell (x (+ ?x 1)) (y ?y) (content water))) ; down
@@ -67,24 +50,7 @@
 	(focus MAIN)
 )
 
-; Make a Guess on a cell positioned on a K-cell with Bottom content
-(defrule guessCellOnTopBottomKCell 
-	(status (step ?s) (currently running))
-	(k-cell (x ?x) (y ?y) (content bot))
-	(not (exec (action guess) (x ?x-top &:(eq ?x-top(- ?x 1))) (y ?y)))
-	(moves (guesses ?ng &:(> ?ng 0)))
-=>
-	(printout t crlf)
-	(printout t "Step " ?s ":    GUESS cell [" (- ?x 1) "," ?y "]"crlf)
-	(assert (exec (step ?s) (action guess) (x (- ?x 1)) (y ?y)))
-	(assert (k-cell (x (- ?x 2)) (y (- ?y 1)) (content water)))	; down diag left
-	(assert (k-cell (x (- ?x 2)) (y (+ ?y 1)) (content water)))	; down diag right
-	; Keeps track that the cell was guessed
-	(assert (cell_status (kx (- ?x 1)) (ky ?y) (stat guessed))) 
-	(focus MAIN)
-)
-
-; Make a Guess on a K-cell with Right Content
+; Make a guess on a K-cell with right content
 (defrule guessRightKCell (declare (salience 100))
 	(status (step ?s)(currently running))
 	(k-cell (x ?x) (y ?y) (content right))
@@ -92,7 +58,7 @@
 	(moves (guesses ?ng &:(> ?ng 0)))
 => 
 	(printout t crlf)
-	(printout t "Step " ?s ":    GUESS cell [" ?x "," ?y "] right"crlf)
+	(printout t "Step " ?s ": GUESS cell [" ?x "," ?y "] right"crlf)
 	(assert (exec(step ?s) (action guess) (x ?x) (y ?y))) ; current cell
 	(assert (k-cell (x ?x) (y (+ ?y 1)) (content water))) ; right
 	(assert (k-cell (x (+ ?x 1)) (y ?y) (content water))) ; down
@@ -106,24 +72,7 @@
 	(focus MAIN)
 )
 
-; Make a Guess on a cell positioned to the left of a K-cell with right content
-(defrule guessCellOnLeftKCellRIght
-	(status (step ?s) (currently running))
-	(k-cell (x ?x) (y ?y) (content right))
-	(not (exec (action guess) (x ?x) (y ?y-left &:(eq ?y-left(- ?y 1)))))
-	(moves (guesses ?ng &:(> ?ng 0)))
-=>
-	(printout t crlf)
-	(printout t "Step " ?s ":    GUESS cell [" ?x "," (- ?y 1) "]"crlf)
-	(assert (exec (step ?s) (action guess) (x ?x) (y (- ?y 1))))
-	(assert (k-cell (x (- ?x 1)) (y (- ?y 2)) (content water))) ; up-left
-	(assert (k-cell (x (+ ?x 1)) (y (- ?y 2)) (content water))) ; down-left
-	; Keeps track that the cell was guessed
-	(assert (cell_status (kx ?x) (ky (- ?y 1)) (stat guessed))) 
-	(focus MAIN)
-)
-
-; Make a Guess on a K-cell with left content
+; Make a guess on a K-cell with left content
 (defrule guessLeftKCell (declare (salience 100))
 	(status (step ?s) (currently running))
 	(k-cell (x ?x) (y ?y) (content left))
@@ -131,7 +80,7 @@
 	(moves (guesses ?ng &:(> ?ng 0)))
 =>
 	(printout t crlf)
-	(printout t "Step " ?s ":    GUESS cell [" ?x "," ?y "] left"crlf)
+	(printout t "Step " ?s ": GUESS cell [" ?x "," ?y "] left"crlf)
 	(assert (exec (step ?s) (action guess) (x ?x) (y ?y)))
 	; Assert water around the K-cell
 	(assert (k-cell (x (+ ?x 1)) (y ?y) (content water))) ; down
@@ -146,24 +95,7 @@
 	(focus MAIN)
 )
 
-; Make a Guess on a cell positioned to the right of a K-cell with left content
-(defrule guessCellOnRightKCellLeft
-	(status (step ?s) (currently running))
-	(k-cell (x ?x) (y ?y) (content left))
-	(not (exec (action guess) (x ?x) (y ?y-right &:(eq ?y-right(+ ?y 1)))))
-	(moves (guesses ?ng &:(> ?ng 0)))
-=>
-	(printout t crlf)
-	(printout t "Step " ?s ":    GUESS cell [" ?x "," (+ ?y 1) "]"crlf)
-	(assert (exec (step ?s) (action guess) (x ?x) (y (+ ?y 1))))
-	(assert (k-cell (x (- ?x 1)) (y (+ ?y 2)) (content water)))	; up diag right
-	(assert (k-cell (x (+ ?x 1)) (y (+ ?y 2)) (content water)))	; down diag right
-	; Keeps track that the cell was guessed
-	(assert (cell_status (kx ?x) (ky (+ ?y 1)) (stat guessed))) 
-	(focus MAIN)
-)
-
-; Make a Guess on a K-cell with sub (submarine) content
+; Make a guess on a K-cell with sub (submarine) content
 (defrule guessSubKCell (declare (salience 100))
 	(status (step ?s) (currently running))
 	(k-cell (x ?x) (y ?y) (content sub))
@@ -172,7 +104,7 @@
 	(moves (guesses ?ng &:(> ?ng 0)))
 =>
 	(printout t crlf)
-	(printout t "Step " ?s ":    GUESS cell [" ?x "," ?y "] sub"crlf)
+	(printout t "Step " ?s ": GUESS cell [" ?x "," ?y "] sub"crlf)
 	(assert (exec (step ?s) (action guess) (x ?x) (y ?y)))
     (modify ?stf (to_find (- ?to_find_s 1))) ; Decrease the number of submarines to find
 	(printout t crlf)
@@ -192,7 +124,7 @@
 	(focus MAIN)
 )
 
-; Make a Guess on a K-cell with middle content
+; Make a guess on a K-cell with middle content
 (defrule guessMiddleKCell (declare (salience 100))
 	(status (step ?s)(currently running))
 	(k-cell (x ?x) (y ?y) (content middle))
@@ -200,7 +132,7 @@
 	(moves (guesses ?ng &:(> ?ng 0)))
 => 
 	(printout t crlf)
-	(printout t "Step " ?s ":    GUESS cell [" ?x "," ?y "] middle"crlf)
+	(printout t "Step " ?s ": GUESS cell [" ?x "," ?y "] middle"crlf)
 	(assert (exec(step ?s) (action guess) (x ?x) (y ?y))) ; this cell
 	(assert (k-cell (x (- ?x 1)) (y (+ ?y 1)) (content water))) ; up-right
 	(assert (k-cell (x (- ?x 1)) (y (- ?y 1)) (content water))) ; up-left
@@ -211,7 +143,77 @@
 	(focus MAIN)
 )
 
-; ################ GUESS ON THE NEAR MIDDLE CELLS ##########################
+; ################### GUESS NEXT TO KNWON CELLS ###################
+
+; Make a guess on a cell positioned under a K-cell with top content
+(defrule guessCellUnderTopKCell
+	(status (step ?s) (currently running))
+	(k-cell (x ?x) (y ?y) (content top))
+	(not (exec (action guess) (x ?x-under &:(eq ?x-under(+ ?x 1))) (y ?y)))
+	(moves (guesses ?ng &:(> ?ng 0)))
+=>
+	(printout t crlf)
+	(printout t "Step " ?s ": GUESS cell [" (+ ?x 1) "," ?y "]"crlf)
+	(assert (exec (step ?s) (action guess) (x (+ ?x 1)) (y ?y)))
+	(assert (k-cell (x (+ ?x 2)) (y (- ?y 1)) (content water)))	; down diag left
+	(assert (k-cell (x (+ ?x 2)) (y (+ ?y 1)) (content water)))	;down diag right
+	; Keeps track that the cell was guessed
+	(assert (cell_status (kx (+ ?x 1)) (ky ?y) (stat guessed)))
+	(focus MAIN)
+)
+
+; Make a guess on a cell positioned above a K-cell with bottom content
+(defrule guessCellOnTopBottomKCell 
+	(status (step ?s) (currently running))
+	(k-cell (x ?x) (y ?y) (content bot))
+	(not (exec (action guess) (x ?x-top &:(eq ?x-top(- ?x 1))) (y ?y)))
+	(moves (guesses ?ng &:(> ?ng 0)))
+=>
+	(printout t crlf)
+	(printout t "Step " ?s ": GUESS cell [" (- ?x 1) "," ?y "]"crlf)
+	(assert (exec (step ?s) (action guess) (x (- ?x 1)) (y ?y)))
+	(assert (k-cell (x (- ?x 2)) (y (- ?y 1)) (content water)))	; down diag left
+	(assert (k-cell (x (- ?x 2)) (y (+ ?y 1)) (content water)))	; down diag right
+	; Keeps track that the cell was guessed
+	(assert (cell_status (kx (- ?x 1)) (ky ?y) (stat guessed))) 
+	(focus MAIN)
+)
+
+; Make a guess on a cell positioned to the left of a K-cell with right content
+(defrule guessCellOnLeftKCellRIght
+	(status (step ?s) (currently running))
+	(k-cell (x ?x) (y ?y) (content right))
+	(not (exec (action guess) (x ?x) (y ?y-left &:(eq ?y-left(- ?y 1)))))
+	(moves (guesses ?ng &:(> ?ng 0)))
+=>
+	(printout t crlf)
+	(printout t "Step " ?s ": GUESS cell [" ?x "," (- ?y 1) "]"crlf)
+	(assert (exec (step ?s) (action guess) (x ?x) (y (- ?y 1))))
+	(assert (k-cell (x (- ?x 1)) (y (- ?y 2)) (content water))) ; up-left
+	(assert (k-cell (x (+ ?x 1)) (y (- ?y 2)) (content water))) ; down-left
+	; Keeps track that the cell was guessed
+	(assert (cell_status (kx ?x) (ky (- ?y 1)) (stat guessed))) 
+	(focus MAIN)
+)
+
+; Make a guess on a cell positioned to the right of a K-cell with left content
+(defrule guessCellOnRightKCellLeft
+	(status (step ?s) (currently running))
+	(k-cell (x ?x) (y ?y) (content left))
+	(not (exec (action guess) (x ?x) (y ?y-right &:(eq ?y-right(+ ?y 1)))))
+	(moves (guesses ?ng &:(> ?ng 0)))
+=>
+	(printout t crlf)
+	(printout t "Step " ?s ": GUESS cell [" ?x "," (+ ?y 1) "]"crlf)
+	(assert (exec (step ?s) (action guess) (x ?x) (y (+ ?y 1))))
+	(assert (k-cell (x (- ?x 1)) (y (+ ?y 2)) (content water)))	; up diag right
+	(assert (k-cell (x (+ ?x 1)) (y (+ ?y 2)) (content water)))	; down diag right
+	; Keeps track that the cell was guessed
+	(assert (cell_status (kx ?x) (ky (+ ?y 1)) (stat guessed))) 
+	(focus MAIN)
+)
+
+; ########################## GUESS ON THE NEAR MIDDLE CELLS ##########################
 
 ; If the K-cell middle has a water to the right or left and the cell above it was not guessed, 
 ; then guess on it
@@ -227,7 +229,7 @@
 	(not (exec (action fire) (x ?x-up &:(eq ?x-up(- ?x 1))) (y ?y)))
 =>
 	(printout t crlf)
-	(printout t "Step " ?s ":    GUESS cell [" (- ?x 1) ", " ?y "] knowing [" ?x "," ?y "] middle"crlf)
+	(printout t "Step " ?s ": GUESS cell [" (- ?x 1) ", " ?y "] knowing [" ?x "," ?y "] middle"crlf)
 	(assert (exec (step ?s) (action guess) (x (- ?x 1))(y ?y)))
 	; Assert water around the cell
 	(assert (k-cell (x ?x) (y (+ ?y 1)) (content water))) ; right
@@ -251,7 +253,7 @@
 	(not (exec (action fire) (x ?x-bot &:(eq ?x-bot(+ ?x 1))) (y ?y)))
 =>
 	(printout t crlf)
-	(printout t "Step " ?s ":    GUESS cell [" (+ ?x 1) ", " ?y "] knowing [" ?x "," ?y "] middle"crlf)
+	(printout t "Step " ?s ": GUESS cell [" (+ ?x 1) ", " ?y "] knowing [" ?x "," ?y "] middle"crlf)
 	(assert (exec (step ?s) (action guess) (x (+ ?x 1)) (y ?y)))
 	; Assert water around the cell
 	(assert (k-cell (x ?x) (y (+ ?y 1)) (content water))) ; right
@@ -275,8 +277,8 @@
 	(not (exec (action fire) (x ?x) (y ?y-left &:(eq ?y-left(- ?y 1)))))
 =>
 	(printout t crlf)
-	(printout t "Step " ?s ":    GUESS cell [" ?x ", " (- ?y 1) "] knowing [" ?x "," ?y "] middle"crlf)
-	(assert (exec (step ?s) (action guess) (x ?x) (y (- ?y 1)) ))
+	(printout t "Step " ?s ": GUESS cell [" ?x ", " (- ?y 1) "] knowing [" ?x "," ?y "] middle"crlf)
+	(assert (exec (step ?s) (action guess) (x ?x) (y (- ?y 1))))
 	; Assert water around the cell
 	(assert (k-cell (x (+ ?x 1)) (y ?y) (content water))) ; down
 	(assert (k-cell (x (- ?x 1)) (y ?y) (content water))) ; up
@@ -285,7 +287,7 @@
 	(focus MAIN)
 )
 
-; If the K-cell Middle has a water above or below and the cell on the right was not guessed, 
+; If the K-cell middle has a water above or below and the cell on the right was not guessed, 
 ; then guess on it
 (defrule guessOnRightMiddleKCell
 	(status (step ?s) (currently running))
@@ -299,7 +301,7 @@
 	(not (exec (action fire) (x ?x) (y ?y-right &:(eq ?y-right(+ ?y 1)))))
 =>
 	(printout t crlf)
-	(printout t "Step " ?s ":    GUESS cell[" ?x ", " (+ ?y 1) "] knowing [" ?x "," ?y "]  middle"crlf)
+	(printout t "Step " ?s ": GUESS cell[" ?x ", " (+ ?y 1) "] knowing [" ?x "," ?y "]  middle"crlf)
 	(assert (exec (step ?s) (action guess) (x ?x) (y (+ ?y 1))))
 	; Assert water around the cell
 	(assert (k-cell (x (+ ?x 1)) (y ?y) (content water))) ; down

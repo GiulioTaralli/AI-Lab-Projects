@@ -2,7 +2,7 @@
 
 (defmodule FIRE_VAL (import MAIN ?ALL) (import ENV ?ALL) (import AGENT ?ALL) (export ?ALL))
 
-; If there are still cruisers then recalls the FIRE module
+; If there are still cruisers then call the fire module
 (defrule fireIfCruiser
 	(status (step ?s)(currently running))
 	(cruiser (to_find ?to_find_c &:(> ?to_find_c 0)))
@@ -11,7 +11,7 @@
 	(focus FIRE_MOD)
 )
 
-; If there are still battleships, then recalls the FIRE module
+; If there are still battleships, then call the fire module
 (defrule fireIfBattleship
 	(status (step ?s)(currently running))
 	(battleship (to_find ?to_find_b &:(> ?to_find_b 0)))
@@ -33,7 +33,7 @@
 	(not (exec (action guess) (x ?x) (y ?y)))
 =>
 	(printout t crlf)
-	(printout t "Step " ?s ":    FIRE ON [" ?x ", " ?y "] based on best K-ROW and K-COL" crlf)
+	(printout t "Step " ?s ": FIRE ON [" ?x ", " ?y "] based on best K-ROW and K-COL" crlf)
 	(assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
 	(focus MAIN)
 )

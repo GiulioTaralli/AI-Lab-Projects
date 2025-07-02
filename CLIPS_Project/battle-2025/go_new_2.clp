@@ -1,7 +1,7 @@
 (clear)
 (load 0_Main.clp)
 (load 1_Env.clp)
-(load mapEnvironment_4_info.clp)
+(load mapEnvironment_no_obs.clp)
 (load agent_2.clp)
 (load Fire_Val_2.clp)
 (load Fire_Mod_2.clp)
